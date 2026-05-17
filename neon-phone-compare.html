@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neon Phone Compare</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #03070f;
+  --panel: #080f1c;
+  --panel2: #0c1628;
+  --line: #132240;
+  --text: #dff5ec;
+  --muted: #5d8a76;
+  --accent: #00ffa3;
+  --accent2: #00b4ff;
+  --accent3: #ff3cac;
+  --good: #00ffa3;
+  --bad: #ff3cac;
+  --glow: rgba(0,255,163,.18);
+  --glow2: rgba(0,180,255,.18);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Space Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,163,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,163,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridDrift 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes gridDrift {
+  from { background-position: 0 0; }
+  to   { background-position: 48px 48px; }
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.08) 2px,
+    rgba(0,0,0,.08) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(3,7,15,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  animation: slideDown .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 18px rgba(0,255,163,.4));
+  white-space: nowrap;
+}
+.logo-sub {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.wrap {
+  max-width: 1640px;
+  margin: 0 auto;
+  padding: 22px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── CARDS ── */
+.card {
+  background: linear-gradient(160deg, rgba(8,15,28,.98), rgba(12,22,40,.96));
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow:
+    0 0 0 1px rgba(0,255,163,.04),
+    0 20px 60px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  animation: fadeUp .5s cubic-bezier(.16,1,.3,1) both;
+}
+.card:nth-child(2) { animation-delay: .08s; }
+.card:nth-child(3) { animation-delay: .16s; }
+
+@keyframes fadeUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--accent);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  opacity: .8;
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+input, select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(3,7,15,.8);
+  color: var(--text);
+  outline: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  transition: border-color .25s, box-shadow .25s, background .25s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,255,163,.14);
+  background: rgba(0,255,163,.04);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235d8a76' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* ── BUTTONS ── */
+button {
+  cursor: pointer;
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
+  width: 100%;
+}
+button:active { transform: scale(.96); }
+
+.btn-primary {
+  border: 1px solid rgba(0,255,163,.5);
+  background: linear-gradient(135deg, rgba(0,255,163,.18), rgba(0,180,255,.22));
+  color: var(--accent);
+  box-shadow: 0 0 20px rgba(0,255,163,.1);
+}
+.btn-primary:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(0,255,163,.25), 0 0 60px rgba(0,255,163,.08);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  border: 1px solid var(--line);
+  background: rgba(12,22,40,.8);
+  color: var(--muted);
+}
+.btn-secondary:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+  box-shadow: 0 0 20px rgba(0,180,255,.12);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  border: 1px solid rgba(255,60,172,.35);
+  background: rgba(255,60,172,.1);
+  color: var(--accent3);
+}
+.btn-danger:hover {
+  border-color: var(--accent3);
+  box-shadow: 0 0 20px rgba(255,60,172,.2);
+}
+
+/* ── CHIPS ── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  min-height: 10px;
+}
+.chip {
+  background: rgba(0,255,163,.06);
+  border: 1px solid rgba(0,255,163,.2);
+  color: var(--text);
+  padding: 7px 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  animation: chipPop .3s cubic-bezier(.34,1.56,.64,1) both;
+  transition: border-color .2s;
+}
+.chip:hover { border-color: rgba(0,255,163,.4); }
+@keyframes chipPop {
+  from { transform: scale(.6); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+.chip-remove {
+  width: auto !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  background: rgba(255,60,172,.14) !important;
+  border: 1px solid rgba(255,60,172,.25) !important;
+  color: var(--accent3) !important;
+  font-family: 'Space Mono', monospace !important;
+  line-height: 1.4;
+}
+.chip-remove:hover {
+  background: rgba(255,60,172,.28) !important;
+  transform: scale(1.1) !important;
+}
+
+/* ── TABLE ── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  margin-top: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.table-wrap::-webkit-scrollbar { height: 6px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+th, td {
+  border-bottom: 1px solid rgba(19,34,64,.7);
+  padding: 13px 14px;
+  text-align: left;
+  vertical-align: middle;
+  transition: background .2s;
+}
+th {
+  position: sticky;
+  top: 0;
+  background: rgba(3,7,15,.96);
+  backdrop-filter: blur(12px);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  text-transform: uppercase;
+  z-index: 4;
+  border-bottom: 1px solid var(--line);
+}
+th.spec-head { color: var(--accent); font-size: 9px; }
+
+.spec-cell {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: .04em;
+}
+
+td.winner {
+  background: rgba(0,255,163,.1);
+  color: #b8ffe2;
+  font-weight: 700;
+  position: relative;
+}
+td.winner::after {
+  content: '▲';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  color: var(--accent);
+  opacity: .6;
+}
+
+tbody tr {
+  animation: rowSlide .4s cubic-bezier(.16,1,.3,1) both;
+}
+tbody tr:nth-child(1)  { animation-delay: .02s; }
+tbody tr:nth-child(2)  { animation-delay: .04s; }
+tbody tr:nth-child(3)  { animation-delay: .06s; }
+tbody tr:nth-child(4)  { animation-delay: .08s; }
+tbody tr:nth-child(5)  { animation-delay: .10s; }
+tbody tr:nth-child(6)  { animation-delay: .12s; }
+tbody tr:nth-child(7)  { animation-delay: .14s; }
+tbody tr:nth-child(8)  { animation-delay: .16s; }
+tbody tr:nth-child(9)  { animation-delay: .18s; }
+tbody tr:nth-child(10) { animation-delay: .20s; }
+
+@keyframes rowSlide {
+  from { transform: translateX(-16px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+tbody tr:hover td { background: rgba(0,255,163,.04); }
+
+/* ── SCORE CARDS ── */
+.scores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.score-box {
+  background: rgba(3,7,15,.85);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  transition: border-color .25s, box-shadow .25s, transform .25s;
+  animation: cardPop .4s cubic-bezier(.34,1.56,.64,1) both;
+  position: relative;
+  overflow: hidden;
+}
+.score-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0,255,163,.04) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.score-box:hover::before { opacity: 1; }
+.score-box:hover {
+  border-color: rgba(0,255,163,.3);
+  box-shadow: 0 0 30px rgba(0,255,163,.1);
+  transform: translateY(-3px);
+}
+.score-box.rank-1 {
+  border-color: rgba(0,255,163,.4);
+  box-shadow: 0 0 30px rgba(0,255,163,.15), inset 0 1px 0 rgba(0,255,163,.1);
+}
+.score-box.rank-1 .rank-badge { color: var(--accent); }
+@keyframes cardPop {
+  from { transform: scale(.85); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.score-box:nth-child(1) { animation-delay: .05s; }
+.score-box:nth-child(2) { animation-delay: .12s; }
+.score-box:nth-child(3) { animation-delay: .19s; }
+.score-box:nth-child(4) { animation-delay: .26s; }
+
+.score-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.score-model { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+.score-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent2);
+}
+.score-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.rank-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--muted);
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+/* ── SCORE BAR ── */
+.bar-wrap {
+  background: rgba(255,255,255,.05);
+  border-radius: 4px;
+  height: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width .8s cubic-bezier(.16,1,.3,1);
+  box-shadow: 0 0 8px rgba(0,255,163,.5);
+}
+
+/* ── SUMMARY BANNER ── */
+.summary-banner {
+  background: linear-gradient(135deg, rgba(0,255,163,.08), rgba(0,180,255,.08));
+  border: 1px solid rgba(0,255,163,.2);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 13px;
+  animation: fadeUp .4s cubic-bezier(.16,1,.3,1) both;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.summary-banner .trophy { font-size: 20px; }
+
+.accent  { color: var(--accent); }
+.accent2 { color: var(--accent2); }
+.accent3 { color: var(--accent3); }
+.small   { font-size: 11px; color: var(--muted); }
+
+/* ── CONTROLS ROW ── */
+.controls-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.controls-row > div { flex: 1; min-width: 150px; }
+
+/* ── NO RESULTS ── */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+
+/* ── PHONE COL HEADER ── */
+.phone-col-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent2);
+}
+.phone-col-brand { font-size: 9px; color: var(--muted); }
+.phone-col-year  { font-size: 9px; color: var(--muted); opacity: .7; }
+
+/* ── PULSE LOADER ── */
+.pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 8px;
+  box-shadow: 0 0 0 0 rgba(0,255,163,.5);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(0,255,163,.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(0,255,163,0);  }
+  100% { box-shadow: 0 0 0 0   rgba(0,255,163,0);   }
+}
+
+/* ── NOTIFICATION TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(8,15,28,.95);
+  border: 1px solid rgba(0,255,163,.3);
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 12px;
+  color: var(--accent);
+  z-index: 100;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: transform .35s cubic-bezier(.16,1,.3,1), opacity .35s;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+  pointer-events: none;
+}
+#toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  header { padding: 14px 16px; }
+  .logo  { font-size: 16px; }
+  .wrap  { padding: 14px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<header>
+  <div>
+    <div class="logo">⬡ NEON COMPARE</div>
+    <div class="logo-sub">Advanced Smartphone Specification Analyzer</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- Search & Filter Card -->
+  <section class="card">
+    <div class="section-title">▸ Select Phones</div>
+    <div class="grid">
+      <div>
+        <label>Search Model</label>
+        <input id="search" list="list" placeholder="e.g. Galaxy S24 Ultra" autocomplete="off" />
+        <datalist id="list"></datalist>
+      </div>
+      <div>
+        <label>Brand</label>
+        <select id="brand"><option value="">All Brands</option></select>
+      </div>
+      <div>
+        <label>Year</label>
+        <select id="year"><option value="">All Years</option></select>
+      </div>
+      <div>
+        <label>Series / Tier</label>
+        <select id="tier">
+          <option value="">All Tiers</option>
+          <option value="ultra">Ultra</option>
+          <option value="pro">Pro / Pro Max</option>
+          <option value="plus">Plus / +</option>
+          <option value="base">Base</option>
+          <option value="lite">Lite / FE / Mini</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end">
+        <label>&nbsp;</label>
+        <button class="btn-primary" id="add">+ Add Phone</button>
+      </div>
+    </div>
+    <div class="chips" id="selected"></div>
+  </section>
+
+  <!-- Compare Card -->
+  <section class="card">
+    <div class="section-title">▸ Compare Settings</div>
+    <div class="controls-row">
+      <div>
+        <label>Scoring Mode</label>
+        <select id="mode">
+          <option value="weighted">Weighted (camera/battery/ram prioritized)</option>
+          <option value="simple">Simple (raw spec wins)</option>
+          <option value="value">Value (performance per size)</option>
+        </select>
+      </div>
+      <div style="min-width:140px;max-width:180px">
+        <label>&nbsp;</label>
+        <button class="btn-primary" id="compare">▶ Compare</button>
+      </div>
+      <div style="min-width:140px;max-width:180px">
+        <label>&nbsp;</label>
+        <button class="btn-secondary" id="clear">✕ Clear All</button>
+      </div>
+      <div style="min-width:140px;max-width:180px">
+        <label>&nbsp;</label>
+        <button class="btn-secondary" id="download">↓ Export JSON</button>
+      </div>
+    </div>
+
+    <div id="summary"></div>
+    <div class="table-wrap"><table id="table"></table></div>
+    <div class="scores-grid" id="scores"></div>
+  </section>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// PHONE DATABASE — All variants included
+// ═══════════════════════════════════════════
+const phones = [
+  // ── SAMSUNG ─────────────────────────────────────────────────────────────
+  {id:1,  brand:"Samsung",model:"Galaxy S8",         year:2017,display:5.8, chip:"Exynos 8895/SD835",   ram:4,  storage:64,  battery:3000,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 7",  weight:155},
+  {id:2,  brand:"Samsung",model:"Galaxy S8+",         year:2017,display:6.2, chip:"Exynos 8895/SD835",   ram:4,  storage:64,  battery:3500,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 7",  weight:173},
+  {id:3,  brand:"Samsung",model:"Galaxy Note 8",      year:2017,display:6.3, chip:"Exynos 8895/SD835",   ram:6,  storage:64,  battery:3300,main:12,  ultra:0,  tele:12, selfie:8,  os:"Android 7.1",weight:195},
+  {id:4,  brand:"Samsung",model:"Galaxy S9",          year:2018,display:5.8, chip:"Exynos 9810/SD845",   ram:4,  storage:64,  battery:3000,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 8",  weight:163},
+  {id:5,  brand:"Samsung",model:"Galaxy S9+",         year:2018,display:6.2, chip:"Exynos 9810/SD845",   ram:6,  storage:64,  battery:3500,main:12,  ultra:0,  tele:12, selfie:8,  os:"Android 8",  weight:189},
+  {id:6,  brand:"Samsung",model:"Galaxy Note 9",      year:2018,display:6.4, chip:"Exynos 9810/SD845",   ram:6,  storage:128, battery:4000,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 8.1",weight:201},
+  {id:7,  brand:"Samsung",model:"Galaxy S10",         year:2019,display:6.1, chip:"Exynos 9820/SD855",   ram:8,  storage:128, battery:3400,main:12,  ultra:16, tele:12, selfie:10, os:"Android 9",  weight:157},
+  {id:8,  brand:"Samsung",model:"Galaxy S10+",        year:2019,display:6.4, chip:"Exynos 9820/SD855",   ram:8,  storage:128, battery:4100,main:12,  ultra:16, tele:12, selfie:10, os:"Android 9",  weight:175},
+  {id:9,  brand:"Samsung",model:"Galaxy S10e",        year:2019,display:5.8, chip:"Exynos 9820/SD855",   ram:6,  storage:128, battery:3100,main:12,  ultra:16, tele:0,  selfie:10, os:"Android 9",  weight:150},
+  {id:10, brand:"Samsung",model:"Galaxy Note 10+",    year:2019,display:6.8, chip:"Exynos 9825/SD855+",  ram:12, storage:256, battery:4300,main:12,  ultra:16, tele:12, selfie:10, os:"Android 9",  weight:196},
+  {id:11, brand:"Samsung",model:"Galaxy S20",         year:2020,display:6.2, chip:"Exynos 990/SD865",    ram:8,  storage:128, battery:4000,main:12,  ultra:12, tele:64, selfie:10, os:"Android 10", weight:163},
+  {id:12, brand:"Samsung",model:"Galaxy S20+",        year:2020,display:6.7, chip:"Exynos 990/SD865",    ram:8,  storage:128, battery:4500,main:12,  ultra:12, tele:64, selfie:10, os:"Android 10", weight:186},
+  {id:13, brand:"Samsung",model:"Galaxy S20 Ultra",   year:2020,display:6.9, chip:"Exynos 990/SD865",    ram:12, storage:128, battery:5000,main:108, ultra:12, tele:48, selfie:40, os:"Android 10", weight:222},
+  {id:14, brand:"Samsung",model:"Galaxy Note 20 Ultra",year:2020,display:6.9,chip:"Exynos 990/SD865+",   ram:12, storage:256, battery:4500,main:108, ultra:12, tele:10, selfie:10, os:"Android 10", weight:208},
+  {id:15, brand:"Samsung",model:"Galaxy S21",         year:2021,display:6.2, chip:"Exynos 2100/SD888",   ram:8,  storage:128, battery:4000,main:12,  ultra:12, tele:64, selfie:10, os:"Android 11", weight:169},
+  {id:16, brand:"Samsung",model:"Galaxy S21+",        year:2021,display:6.7, chip:"Exynos 2100/SD888",   ram:8,  storage:128, battery:4800,main:12,  ultra:12, tele:64, selfie:10, os:"Android 11", weight:200},
+  {id:17, brand:"Samsung",model:"Galaxy S21 Ultra",   year:2021,display:6.8, chip:"Exynos 2100/SD888",   ram:12, storage:128, battery:5000,main:108, ultra:12, tele:10, selfie:40, os:"Android 11", weight:227},
+  {id:18, brand:"Samsung",model:"Galaxy S22",         year:2022,display:6.1, chip:"Exynos 2200/SD8Gen1", ram:8,  storage:128, battery:3700,main:50,  ultra:12, tele:10, selfie:10, os:"Android 12", weight:167},
+  {id:19, brand:"Samsung",model:"Galaxy S22+",        year:2022,display:6.6, chip:"Exynos 2200/SD8Gen1", ram:8,  storage:128, battery:4500,main:50,  ultra:12, tele:10, selfie:10, os:"Android 12", weight:196},
+  {id:20, brand:"Samsung",model:"Galaxy S22 Ultra",   year:2022,display:6.8, chip:"Exynos 2200/SD8Gen1", ram:12, storage:256, battery:5000,main:108, ultra:12, tele:10, selfie:40, os:"Android 12", weight:228},
+  {id:21, brand:"Samsung",model:"Galaxy S23",         year:2023,display:6.1, chip:"SD8Gen2",             ram:8,  storage:128, battery:3900,main:50,  ultra:12, tele:10, selfie:12, os:"Android 13", weight:168},
+  {id:22, brand:"Samsung",model:"Galaxy S23+",        year:2023,display:6.6, chip:"SD8Gen2",             ram:8,  storage:256, battery:4700,main:50,  ultra:12, tele:10, selfie:12, os:"Android 13", weight:196},
+  {id:23, brand:"Samsung",model:"Galaxy S23 Ultra",   year:2023,display:6.8, chip:"SD8Gen2",             ram:12, storage:256, battery:5000,main:200, ultra:12, tele:10, selfie:12, os:"Android 13", weight:234},
+  {id:24, brand:"Samsung",model:"Galaxy S23 FE",      year:2023,display:6.4, chip:"Exynos 2200/SD8Gen1", ram:8,  storage:128, battery:4500,main:50,  ultra:12, tele:8,  selfie:10, os:"Android 13", weight:209},
+  {id:25, brand:"Samsung",model:"Galaxy S24",         year:2024,display:6.2, chip:"Exynos 2400/SD8Gen3", ram:8,  storage:128, battery:4000,main:50,  ultra:12, tele:10, selfie:12, os:"Android 14", weight:167},
+  {id:26, brand:"Samsung",model:"Galaxy S24+",        year:2024,display:6.7, chip:"SD8Gen3",             ram:12, storage:256, battery:4900,main:50,  ultra:12, tele:10, selfie:12, os:"Android 14", weight:196},
+  {id:27, brand:"Samsung",model:"Galaxy S24 Ultra",   year:2024,display:6.8, chip:"SD8Gen3",             ram:12, storage:256, battery:5000,main:200, ultra:12, tele:50, selfie:12, os:"Android 14", weight:232},
+  {id:28, brand:"Samsung",model:"Galaxy S24 FE",      year:2024,display:6.7, chip:"Exynos 2500",         ram:8,  storage:128, battery:4700,main:50,  ultra:12, tele:8,  selfie:10, os:"Android 14", weight:213},
+  {id:29, brand:"Samsung",model:"Galaxy S25",         year:2025,display:6.2, chip:"SD8Elite",            ram:12, storage:128, battery:4000,main:50,  ultra:12, tele:10, selfie:12, os:"Android 15", weight:162},
+  {id:30, brand:"Samsung",model:"Galaxy S25+",        year:2025,display:6.7, chip:"SD8Elite",            ram:12, storage:256, battery:4900,main:50,  ultra:12, tele:10, selfie:12, os:"Android 15", weight:190},
+  {id:31, brand:"Samsung",model:"Galaxy S25 Ultra",   year:2025,display:6.9, chip:"SD8Elite",            ram:12, storage:256, battery:5000,main:200, ultra:50, tele:50, selfie:12, os:"Android 15", weight:230},
+  // ── APPLE ───────────────────────────────────────────────────────────────
+  {id:101,brand:"Apple",  model:"iPhone X",           year:2017,display:5.8, chip:"A11 Bionic",          ram:3,  storage:64,  battery:2716,main:12,  ultra:0,  tele:12, selfie:7,  os:"iOS 11",     weight:174},
+  {id:102,brand:"Apple",  model:"iPhone XS",          year:2018,display:5.8, chip:"A12 Bionic",          ram:4,  storage:64,  battery:2658,main:12,  ultra:0,  tele:12, selfie:7,  os:"iOS 12",     weight:177},
+  {id:103,brand:"Apple",  model:"iPhone XS Max",      year:2018,display:6.5, chip:"A12 Bionic",          ram:4,  storage:64,  battery:3174,main:12,  ultra:0,  tele:12, selfie:7,  os:"iOS 12",     weight:208},
+  {id:104,brand:"Apple",  model:"iPhone XR",          year:2018,display:6.1, chip:"A12 Bionic",          ram:3,  storage:64,  battery:2942,main:12,  ultra:0,  tele:0,  selfie:7,  os:"iOS 12",     weight:194},
+  {id:105,brand:"Apple",  model:"iPhone 11",          year:2019,display:6.1, chip:"A13 Bionic",          ram:4,  storage:64,  battery:3110,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 13",     weight:194},
+  {id:106,brand:"Apple",  model:"iPhone 11 Pro",      year:2019,display:5.8, chip:"A13 Bionic",          ram:4,  storage:64,  battery:3046,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 13",     weight:188},
+  {id:107,brand:"Apple",  model:"iPhone 11 Pro Max",  year:2019,display:6.5, chip:"A13 Bionic",          ram:4,  storage:64,  battery:3969,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 13",     weight:226},
+  {id:108,brand:"Apple",  model:"iPhone 12",          year:2020,display:6.1, chip:"A14 Bionic",          ram:4,  storage:64,  battery:2815,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 14",     weight:164},
+  {id:109,brand:"Apple",  model:"iPhone 12 mini",     year:2020,display:5.4, chip:"A14 Bionic",          ram:4,  storage:64,  battery:2227,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 14",     weight:135},
+  {id:110,brand:"Apple",  model:"iPhone 12 Pro",      year:2020,display:6.1, chip:"A14 Bionic",          ram:6,  storage:128, battery:2815,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 14",     weight:189},
+  {id:111,brand:"Apple",  model:"iPhone 12 Pro Max",  year:2020,display:6.7, chip:"A14 Bionic",          ram:6,  storage:128, battery:3687,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 14",     weight:228},
+  {id:112,brand:"Apple",  model:"iPhone 13",          year:2021,display:6.1, chip:"A15 Bionic",          ram:4,  storage:128, battery:3227,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 15",     weight:174},
+  {id:113,brand:"Apple",  model:"iPhone 13 mini",     year:2021,display:5.4, chip:"A15 Bionic",          ram:4,  storage:128, battery:2406,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 15",     weight:141},
+  {id:114,brand:"Apple",  model:"iPhone 13 Pro",      year:2021,display:6.1, chip:"A15 Bionic",          ram:6,  storage:128, battery:3095,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 15",     weight:204},
+  {id:115,brand:"Apple",  model:"iPhone 13 Pro Max",  year:2021,display:6.7, chip:"A15 Bionic",          ram:6,  storage:128, battery:4352,main:12,  ultra:12, tele:12, selfie:12, os:"iOS 15",     weight:240},
+  {id:116,brand:"Apple",  model:"iPhone 14",          year:2022,display:6.1, chip:"A15 Bionic",          ram:6,  storage:128, battery:3279,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 16",     weight:172},
+  {id:117,brand:"Apple",  model:"iPhone 14 Plus",     year:2022,display:6.7, chip:"A15 Bionic",          ram:6,  storage:128, battery:4323,main:12,  ultra:12, tele:0,  selfie:12, os:"iOS 16",     weight:203},
+  {id:118,brand:"Apple",  model:"iPhone 14 Pro",      year:2022,display:6.1, chip:"A16 Bionic",          ram:6,  storage:128, battery:3200,main:48,  ultra:12, tele:12, selfie:12, os:"iOS 16",     weight:206},
+  {id:119,brand:"Apple",  model:"iPhone 14 Pro Max",  year:2022,display:6.7, chip:"A16 Bionic",          ram:6,  storage:128, battery:4323,main:48,  ultra:12, tele:12, selfie:12, os:"iOS 16",     weight:240},
+  {id:120,brand:"Apple",  model:"iPhone 15",          year:2023,display:6.1, chip:"A16 Bionic",          ram:6,  storage:128, battery:3349,main:48,  ultra:12, tele:0,  selfie:12, os:"iOS 17",     weight:171},
+  {id:121,brand:"Apple",  model:"iPhone 15 Plus",     year:2023,display:6.7, chip:"A16 Bionic",          ram:6,  storage:128, battery:4383,main:48,  ultra:12, tele:0,  selfie:12, os:"iOS 17",     weight:201},
+  {id:122,brand:"Apple",  model:"iPhone 15 Pro",      year:2023,display:6.1, chip:"A17 Pro",             ram:8,  storage:128, battery:3274,main:48,  ultra:12, tele:12, selfie:12, os:"iOS 17",     weight:187},
+  {id:123,brand:"Apple",  model:"iPhone 15 Pro Max",  year:2023,display:6.7, chip:"A17 Pro",             ram:8,  storage:256, battery:4422,main:48,  ultra:12, tele:12, selfie:12, os:"iOS 17",     weight:221},
+  {id:124,brand:"Apple",  model:"iPhone 16",          year:2024,display:6.1, chip:"A18",                 ram:8,  storage:128, battery:3561,main:48,  ultra:12, tele:0,  selfie:12, os:"iOS 18",     weight:170},
+  {id:125,brand:"Apple",  model:"iPhone 16 Plus",     year:2024,display:6.7, chip:"A18",                 ram:8,  storage:128, battery:4674,main:48,  ultra:12, tele:0,  selfie:12, os:"iOS 18",     weight:199},
+  {id:126,brand:"Apple",  model:"iPhone 16 Pro",      year:2024,display:6.3, chip:"A18 Pro",             ram:8,  storage:128, battery:3582,main:48,  ultra:48, tele:12, selfie:12, os:"iOS 18",     weight:199},
+  {id:127,brand:"Apple",  model:"iPhone 16 Pro Max",  year:2024,display:6.9, chip:"A18 Pro",             ram:8,  storage:256, battery:4685,main:48,  ultra:48, tele:12, selfie:12, os:"iOS 18",     weight:227},
+  // ── GOOGLE PIXEL ────────────────────────────────────────────────────────
+  {id:201,brand:"Google", model:"Pixel 2 XL",         year:2017,display:6.0, chip:"SD835",               ram:4,  storage:64,  battery:3520,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 8",  weight:175},
+  {id:202,brand:"Google", model:"Pixel 3",            year:2018,display:5.5, chip:"SD845",               ram:4,  storage:64,  battery:2915,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 9",  weight:148},
+  {id:203,brand:"Google", model:"Pixel 3 XL",         year:2018,display:6.3, chip:"SD845",               ram:4,  storage:64,  battery:3430,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 9",  weight:184},
+  {id:204,brand:"Google", model:"Pixel 4",            year:2019,display:5.7, chip:"SD855",               ram:6,  storage:64,  battery:2800,main:12,  ultra:0,  tele:16, selfie:8,  os:"Android 10", weight:162},
+  {id:205,brand:"Google", model:"Pixel 4 XL",         year:2019,display:6.3, chip:"SD855",               ram:6,  storage:64,  battery:3700,main:12,  ultra:0,  tele:16, selfie:8,  os:"Android 10", weight:193},
+  {id:206,brand:"Google", model:"Pixel 4a",           year:2020,display:5.8, chip:"SD730G",              ram:6,  storage:128, battery:3140,main:12,  ultra:0,  tele:0,  selfie:8,  os:"Android 10", weight:143},
+  {id:207,brand:"Google", model:"Pixel 5",            year:2020,display:6.0, chip:"SD765G",              ram:8,  storage:128, battery:4080,main:12,  ultra:16, tele:0,  selfie:8,  os:"Android 11", weight:151},
+  {id:208,brand:"Google", model:"Pixel 6",            year:2021,display:6.4, chip:"Tensor",              ram:8,  storage:128, battery:4614,main:50,  ultra:12, tele:0,  selfie:8,  os:"Android 12", weight:207},
+  {id:209,brand:"Google", model:"Pixel 6 Pro",        year:2021,display:6.7, chip:"Tensor",              ram:12, storage:128, battery:5003,main:50,  ultra:12, tele:48, selfie:11, os:"Android 12", weight:210},
+  {id:210,brand:"Google", model:"Pixel 6a",           year:2022,display:6.1, chip:"Tensor",              ram:6,  storage:128, battery:4306,main:12,  ultra:12, tele:0,  selfie:8,  os:"Android 12", weight:178},
+  {id:211,brand:"Google", model:"Pixel 7",            year:2022,display:6.3, chip:"Tensor G2",           ram:8,  storage:128, battery:4355,main:50,  ultra:12, tele:0,  selfie:10, os:"Android 13", weight:197},
+  {id:212,brand:"Google", model:"Pixel 7 Pro",        year:2022,display:6.7, chip:"Tensor G2",           ram:12, storage:128, battery:5000,main:50,  ultra:12, tele:48, selfie:10, os:"Android 13", weight:212},
+  {id:213,brand:"Google", model:"Pixel 7a",           year:2023,display:6.1, chip:"Tensor G2",           ram:8,  storage:128, battery:4385,main:64,  ultra:13, tele:0,  selfie:13, os:"Android 13", weight:193},
+  {id:214,brand:"Google", model:"Pixel 8",            year:2023,display:6.2, chip:"Tensor G3",           ram:8,  storage:128, battery:4575,main:50,  ultra:12, tele:0,  selfie:10, os:"Android 14", weight:187},
+  {id:215,brand:"Google", model:"Pixel 8 Pro",        year:2023,display:6.7, chip:"Tensor G3",           ram:12, storage:128, battery:5050,main:50,  ultra:48, tele:48, selfie:10, os:"Android 14", weight:213},
+  {id:216,brand:"Google", model:"Pixel 8a",           year:2024,display:6.1, chip:"Tensor G3",           ram:8,  storage:128, battery:4492,main:64,  ultra:13, tele:0,  selfie:13, os:"Android 14", weight:188},
+  {id:217,brand:"Google", model:"Pixel 9",            year:2024,display:6.3, chip:"Tensor G4",           ram:12, storage:128, battery:4700,main:50,  ultra:48, tele:0,  selfie:10, os:"Android 15", weight:198},
+  {id:218,brand:"Google", model:"Pixel 9 Pro",        year:2024,display:6.3, chip:"Tensor G4",           ram:16, storage:128, battery:4700,main:50,  ultra:48, tele:48, selfie:42, os:"Android 15", weight:199},
+  {id:219,brand:"Google", model:"Pixel 9 Pro XL",     year:2024,display:6.8, chip:"Tensor G4",           ram:16, storage:128, battery:5100,main:50,  ultra:48, tele:48, selfie:42, os:"Android 15", weight:221},
+  {id:220,brand:"Google", model:"Pixel 9 Pro Fold",   year:2024,display:8.0, chip:"Tensor G4",           ram:16, storage:256, battery:4650,main:48,  ultra:10, tele:10, selfie:10, os:"Android 15", weight:257},
+  // ── ONEPLUS ─────────────────────────────────────────────────────────────
+  {id:301,brand:"OnePlus",model:"OnePlus 6",          year:2018,display:6.28,chip:"SD845",               ram:6,  storage:64,  battery:3300,main:16,  ultra:0,  tele:20, selfie:16, os:"OxygenOS 5", weight:177},
+  {id:302,brand:"OnePlus",model:"OnePlus 6T",         year:2018,display:6.41,chip:"SD845",               ram:6,  storage:128, battery:3700,main:16,  ultra:0,  tele:20, selfie:16, os:"OxygenOS 9", weight:185},
+  {id:303,brand:"OnePlus",model:"OnePlus 7",          year:2019,display:6.41,chip:"SD855",               ram:6,  storage:128, battery:3700,main:48,  ultra:5,  tele:0,  selfie:16, os:"OxygenOS 9", weight:182},
+  {id:304,brand:"OnePlus",model:"OnePlus 7 Pro",      year:2019,display:6.67,chip:"SD855",               ram:6,  storage:128, battery:4000,main:48,  ultra:16, tele:8,  selfie:16, os:"OxygenOS 9", weight:206},
+  {id:305,brand:"OnePlus",model:"OnePlus 7T",         year:2019,display:6.55,chip:"SD855+",              ram:8,  storage:128, battery:3800,main:48,  ultra:16, tele:12, selfie:16, os:"OxygenOS 10",weight:190},
+  {id:306,brand:"OnePlus",model:"OnePlus 7T Pro",     year:2019,display:6.67,chip:"SD855+",              ram:8,  storage:256, battery:4085,main:48,  ultra:16, tele:8,  selfie:16, os:"OxygenOS 10",weight:206},
+  {id:307,brand:"OnePlus",model:"OnePlus 8",          year:2020,display:6.55,chip:"SD865",               ram:8,  storage:128, battery:4300,main:48,  ultra:16, tele:2,  selfie:16, os:"OxygenOS 10",weight:180},
+  {id:308,brand:"OnePlus",model:"OnePlus 8 Pro",      year:2020,display:6.78,chip:"SD865",               ram:8,  storage:128, battery:4510,main:48,  ultra:48, tele:8,  selfie:16, os:"OxygenOS 10",weight:199},
+  {id:309,brand:"OnePlus",model:"OnePlus 8T",         year:2020,display:6.55,chip:"SD865",               ram:8,  storage:128, battery:4500,main:48,  ultra:16, tele:5,  selfie:16, os:"OxygenOS 11",weight:188},
+  {id:310,brand:"OnePlus",model:"OnePlus 9",          year:2021,display:6.55,chip:"SD888",               ram:8,  storage:128, battery:4500,main:48,  ultra:50, tele:2,  selfie:16, os:"OxygenOS 11",weight:183},
+  {id:311,brand:"OnePlus",model:"OnePlus 9 Pro",      year:2021,display:6.7, chip:"SD888",               ram:8,  storage:128, battery:4500,main:48,  ultra:50, tele:8,  selfie:16, os:"OxygenOS 11",weight:197},
+  {id:312,brand:"OnePlus",model:"OnePlus 10 Pro",     year:2022,display:6.7, chip:"SD8Gen1",             ram:8,  storage:128, battery:5000,main:48,  ultra:50, tele:8,  selfie:32, os:"OxygenOS 12",weight:200},
+  {id:313,brand:"OnePlus",model:"OnePlus 10T",        year:2022,display:6.7, chip:"SD8+ Gen1",           ram:8,  storage:128, battery:4800,main:50,  ultra:8,  tele:2,  selfie:16, os:"OxygenOS 12",weight:204},
+  {id:314,brand:"OnePlus",model:"OnePlus 11",         year:2023,display:6.7, chip:"SD8Gen2",             ram:12, storage:256, battery:5000,main:50,  ultra:48, tele:32, selfie:16, os:"OxygenOS 13",weight:205},
+  {id:315,brand:"OnePlus",model:"OnePlus 12",         year:2024,display:6.82,chip:"SD8Gen3",             ram:12, storage:256, battery:5400,main:50,  ultra:48, tele:64, selfie:32, os:"OxygenOS 14",weight:220},
+  {id:316,brand:"OnePlus",model:"OnePlus 13",         year:2025,display:6.82,chip:"SD8Elite",            ram:12, storage:256, battery:6000,main:50,  ultra:50, tele:50, selfie:32, os:"OxygenOS 15",weight:213},
+  // ── XIAOMI ──────────────────────────────────────────────────────────────
+  {id:401,brand:"Xiaomi", model:"Mi 9",               year:2019,display:6.39,chip:"SD855",               ram:6,  storage:64,  battery:3300,main:48,  ultra:16, tele:12, selfie:20, os:"MIUI 10",    weight:173},
+  {id:402,brand:"Xiaomi", model:"Mi 10",              year:2020,display:6.67,chip:"SD865",               ram:8,  storage:128, battery:4780,main:108, ultra:13, tele:2,  selfie:20, os:"MIUI 11",    weight:208},
+  {id:403,brand:"Xiaomi", model:"Mi 10 Pro",          year:2020,display:6.67,chip:"SD865",               ram:8,  storage:128, battery:4500,main:108, ultra:20, tele:12, selfie:20, os:"MIUI 11",    weight:208},
+  {id:404,brand:"Xiaomi", model:"Mi 11",              year:2021,display:6.81,chip:"SD888",               ram:8,  storage:128, battery:4600,main:108, ultra:13, tele:5,  selfie:20, os:"MIUI 12",    weight:196},
+  {id:405,brand:"Xiaomi", model:"Mi 11 Ultra",        year:2021,display:6.81,chip:"SD888",               ram:12, storage:256, battery:5000,main:50,  ultra:48, tele:48, selfie:20, os:"MIUI 12.5",  weight:234},
+  {id:406,brand:"Xiaomi", model:"12 Pro",             year:2022,display:6.73,chip:"SD8Gen1",             ram:12, storage:256, battery:4600,main:50,  ultra:50, tele:50, selfie:32, os:"MIUI 13",    weight:205},
+  {id:407,brand:"Xiaomi", model:"12S Ultra",          year:2022,display:6.73,chip:"SD8+Gen1",            ram:12, storage:256, battery:4860,main:50,  ultra:48, tele:48, selfie:32, os:"MIUI 13",    weight:225},
+  {id:408,brand:"Xiaomi", model:"13",                 year:2023,display:6.36,chip:"SD8Gen2",             ram:8,  storage:128, battery:4500,main:54,  ultra:12, tele:10, selfie:32, os:"HyperOS",    weight:189},
+  {id:409,brand:"Xiaomi", model:"13 Pro",             year:2023,display:6.73,chip:"SD8Gen2",             ram:12, storage:256, battery:4820,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS",    weight:229},
+  {id:410,brand:"Xiaomi", model:"13 Ultra",           year:2023,display:6.73,chip:"SD8Gen2",             ram:12, storage:256, battery:5000,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS",    weight:227},
+  {id:411,brand:"Xiaomi", model:"14",                 year:2024,display:6.36,chip:"SD8Gen3",             ram:12, storage:256, battery:4610,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS",    weight:188},
+  {id:412,brand:"Xiaomi", model:"14 Pro",             year:2024,display:6.73,chip:"SD8Gen3",             ram:16, storage:512, battery:4880,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS",    weight:223},
+  {id:413,brand:"Xiaomi", model:"14 Ultra",           year:2024,display:6.73,chip:"SD8Gen3",             ram:16, storage:512, battery:5000,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS",    weight:219},
+  {id:414,brand:"Xiaomi", model:"15",                 year:2025,display:6.36,chip:"SD8Elite",            ram:12, storage:256, battery:5240,main:50,  ultra:50, tele:50, selfie:32, os:"HyperOS 2",  weight:189},
+  {id:415,brand:"Xiaomi", model:"15 Ultra",           year:2025,display:6.73,chip:"SD8Elite",            ram:16, storage:512, battery:6000,main:200, ultra:50, tele:50, selfie:50, os:"HyperOS 2",  weight:229},
+  // ── OPPO ────────────────────────────────────────────────────────────────
+  {id:501,brand:"Oppo",   model:"Find X2 Pro",        year:2020,display:6.7, chip:"SD865",               ram:12, storage:256, battery:4260,main:48,  ultra:48, tele:13, selfie:32, os:"ColorOS 7.1",weight:217},
+  {id:502,brand:"Oppo",   model:"Find X3 Pro",        year:2021,display:6.7, chip:"SD888",               ram:12, storage:256, battery:4500,main:50,  ultra:50, tele:13, selfie:32, os:"ColorOS 11", weight:193},
+  {id:503,brand:"Oppo",   model:"Find X5",            year:2022,display:6.55,chip:"SD888+",              ram:8,  storage:256, battery:4800,main:50,  ultra:50, tele:13, selfie:32, os:"ColorOS 12", weight:196},
+  {id:504,brand:"Oppo",   model:"Find X5 Pro",        year:2022,display:6.7, chip:"SD8Gen1",             ram:12, storage:256, battery:5000,main:50,  ultra:50, tele:13, selfie:32, os:"ColorOS 12", weight:218},
+  {id:505,brand:"Oppo",   model:"Find X6 Pro",        year:2023,display:6.82,chip:"SD8Gen2",             ram:16, storage:512, battery:5000,main:50,  ultra:50, tele:50, selfie:32, os:"ColorOS 13", weight:216},
+  {id:506,brand:"Oppo",   model:"Find X7 Ultra",      year:2024,display:6.82,chip:"SD8Gen3",             ram:16, storage:512, battery:5000,main:50,  ultra:50, tele:50, selfie:32, os:"ColorOS 14", weight:221},
+  {id:507,brand:"Oppo",   model:"Find X8 Pro",        year:2024,display:6.78,chip:"Dimensity 9400",      ram:16, storage:512, battery:5910,main:50,  ultra:50, tele:50, selfie:32, os:"ColorOS 15", weight:215},
+  {id:508,brand:"Oppo",   model:"Reno 12 Pro",        year:2024,display:6.7, chip:"Dimensity 9200+",     ram:12, storage:256, battery:5000,main:50,  ultra:8,  tele:50, selfie:50, os:"ColorOS 14", weight:181},
+  // ── HUAWEI ──────────────────────────────────────────────────────────────
+  {id:601,brand:"Huawei", model:"P20 Pro",            year:2018,display:6.1, chip:"Kirin 970",           ram:6,  storage:128, battery:4000,main:40,  ultra:20, tele:8,  selfie:24, os:"EMUI 8",     weight:180},
+  {id:602,brand:"Huawei", model:"P30 Pro",            year:2019,display:6.47,chip:"Kirin 980",           ram:8,  storage:128, battery:4200,main:40,  ultra:20, tele:8,  selfie:32, os:"EMUI 9.1",   weight:192},
+  {id:603,brand:"Huawei", model:"Mate 30 Pro",        year:2019,display:6.53,chip:"Kirin 990",           ram:8,  storage:128, battery:4500,main:40,  ultra:40, tele:8,  selfie:32, os:"EMUI 10",    weight:198},
+  {id:604,brand:"Huawei", model:"Mate 40 Pro",        year:2020,display:6.76,chip:"Kirin 9000",          ram:8,  storage:256, battery:4400,main:50,  ultra:20, tele:12, selfie:13, os:"EMUI 11",    weight:212},
+  {id:605,brand:"Huawei", model:"P50 Pro",            year:2021,display:6.6, chip:"Kirin 9000/SD888",    ram:8,  storage:256, battery:4360,main:50,  ultra:13, tele:64, selfie:13, os:"HarmonyOS",  weight:195},
+  {id:606,brand:"Huawei", model:"Pura 70 Pro",        year:2024,display:6.8, chip:"Kirin 9010",          ram:12, storage:256, battery:5000,main:50,  ultra:40, tele:50, selfie:13, os:"HarmonyOS 4",weight:220},
+  {id:607,brand:"Huawei", model:"Pura 70 Ultra",      year:2024,display:6.8, chip:"Kirin 9010",          ram:16, storage:512, battery:5200,main:50,  ultra:40, tele:50, selfie:13, os:"HarmonyOS 4",weight:226},
+  // ── MOTOROLA ────────────────────────────────────────────────────────────
+  {id:701,brand:"Motorola",model:"Edge+",             year:2020,display:6.7, chip:"SD865",               ram:12, storage:256, battery:5000,main:108, ultra:16, tele:8,  selfie:25, os:"Android 10", weight:203},
+  {id:702,brand:"Motorola",model:"Edge 20 Pro",       year:2021,display:6.67,chip:"SD870",               ram:12, storage:256, battery:4500,main:108, ultra:16, tele:8,  selfie:32, os:"Android 11", weight:190},
+  {id:703,brand:"Motorola",model:"Edge 30 Ultra",     year:2022,display:6.67,chip:"SD8+Gen1",            ram:12, storage:256, battery:4610,main:200, ultra:50, tele:12, selfie:60, os:"Android 12", weight:198},
+  {id:704,brand:"Motorola",model:"Edge 40 Pro",       year:2023,display:6.67,chip:"SD8Gen2",             ram:12, storage:256, battery:4600,main:50,  ultra:50, tele:12, selfie:60, os:"Android 13", weight:199},
+  {id:705,brand:"Motorola",model:"Edge 50 Ultra",     year:2024,display:6.7, chip:"SD8sGen3",            ram:16, storage:512, battery:4500,main:50,  ultra:50, tele:64, selfie:50, os:"Android 14", weight:197},
+  {id:706,brand:"Motorola",model:"Razr 50 Ultra",     year:2024,display:6.9, chip:"SD8sGen3",            ram:12, storage:256, battery:4000,main:50,  ultra:13, tele:0,  selfie:32, os:"Android 14", weight:189},
+];
+
+// ═══════════════════════════════════════════
+// STATE & ELEMENTS
+// ═══════════════════════════════════════════
+const selected = [];
+const $  = id => document.getElementById(id);
+const search   = $('search');
+const list     = $('list');
+const brandEl  = $('brand');
+const yearEl   = $('year');
+const tierEl   = $('tier');
+const modeEl   = $('mode');
+const selEl    = $('selected');
+const summaryEl= $('summary');
+const tableEl  = $('table');
+const scoresEl = $('scores');
+
+// ─── Populate filters ────────────────────────────────────
+[...new Set(phones.map(p=>p.brand))].sort().forEach(b=>{
+  brandEl.insertAdjacentHTML('beforeend', `<option value="${b}">${b}</option>`);
+});
+[...new Set(phones.map(p=>p.year))].sort((a,b)=>b-a).forEach(y=>{
+  yearEl.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`);
+});
+
+// ─── Tier detection ──────────────────────────────────────
+function getTier(model) {
+  const m = model.toLowerCase();
+  if (/ultra/.test(m))               return 'ultra';
+  if (/pro max|pro xl|pro fold/.test(m)) return 'pro';
+  if (/pro/.test(m))                 return 'pro';
+  if (/plus|\+/.test(m))             return 'plus';
+  if (/lite|fe|mini|a\d|e\d/.test(m))return 'lite';
+  return 'base';
+}
+
+// ─── Refresh datalist ────────────────────────────────────
+function refreshList() {
+  const b = brandEl.value;
+  const y = yearEl.value;
+  const t = tierEl.value;
+  const filtered = phones.filter(p =>
+    (!b || p.brand === b) &&
+    (!y || String(p.year) === y) &&
+    (!t || getTier(p.model) === t)
+  );
+  list.innerHTML = filtered.map(p =>
+    `<option value="${p.brand} ${p.model}"></option>`
+  ).join('');
+}
+
+brandEl.addEventListener('change', refreshList);
+yearEl.addEventListener('change', refreshList);
+tierEl.addEventListener('change', refreshList);
+refreshList();
+
+// ─── Render chips ────────────────────────────────────────
+function renderSelected() {
+  selEl.innerHTML = selected.map((p, i) =>
+    `<div class="chip">
+      <span>${p.brand} ${p.model} <span style="opacity:.5">(${p.year})</span></span>
+      <button class="chip-remove" onclick="removePhone(${i})">✕</button>
+    </div>`
+  ).join('');
+}
+window.removePhone = i => {
+  selected.splice(i, 1);
+  renderSelected();
+  showToast('Phone removed');
+};
+
+// ─── Toast ───────────────────────────────────────────────
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── Add phone ───────────────────────────────────────────
+$('add').addEventListener('click', () => {
+  const q = search.value.trim().toLowerCase();
+  if (!q) { showToast('Type a phone name first'); return; }
+  const found = phones.find(p =>
+    (`${p.brand} ${p.model}`).toLowerCase() === q ||
+    p.model.toLowerCase() === q ||
+    (`${p.brand} ${p.model}`).toLowerCase().includes(q)
+  );
+  if (!found) { showToast('Phone not found — try the datalist'); return; }
+  if (selected.some(x => x.id === found.id)) { showToast('Already added!'); return; }
+  if (selected.length >= 6) { showToast('Max 6 phones at once'); return; }
+  selected.push(found);
+  renderSelected();
+  search.value = '';
+  showToast(`✓ Added ${found.brand} ${found.model}`);
+});
+
+// Allow Enter key
+search.addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('add').click();
+});
+
+// ─── Clear all ───────────────────────────────────────────
+$('clear').addEventListener('click', () => {
+  selected.length = 0;
+  renderSelected();
+  tableEl.innerHTML = '';
+  scoresEl.innerHTML = '';
+  summaryEl.innerHTML = '';
+  showToast('Cleared');
+});
+
+// ─── Download JSON ───────────────────────────────────────
+$('download').addEventListener('click', () => {
+  if (!selected.length) { showToast('Add phones first'); return; }
+  const data = {
+    exported: new Date().toISOString(),
+    mode: modeEl.value,
+    phones: selected
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'phone-compare.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('↓ Downloading JSON…');
+});
+
+// ─── Scoring ─────────────────────────────────────────────
+const WEIGHTED = {
+  display: 0.5, ram: 1.2, storage: 0.6, battery: 0.0025,
+  main: 0.09, ultra: 0.07, tele: 0.07, selfie: 0.05, weight: 0.015
+};
+const SIMPLE = {
+  display: 1, ram: 1, storage: 1, battery: 1,
+  main: 1, ultra: 1, tele: 1, selfie: 1, weight: 1
+};
+// Value mode: score / weight bonus
+function scoreOf(mode, spec, p) {
+  const w = mode === 'weighted' ? WEIGHTED[spec] : SIMPLE[spec];
+  const raw = spec === 'weight' ? -p[spec] : p[spec];
+  if (mode === 'value') {
+    // Value = spec per gram, so bigger/lighter is better
+    return spec === 'weight' ? -p[spec] * 0.015 : (p[spec] / (p.weight || 200)) * (WEIGHTED[spec] || 1) * 100;
+  }
+  return raw * (w || 1);
+}
+
+// ─── Compare ─────────────────────────────────────────────
+$('compare').addEventListener('click', () => {
+  if (selected.length < 2) {
+    summaryEl.innerHTML = `<div class="empty-state">Add at least 2 phones to compare.</div>`;
+    return;
+  }
+
+  const mode = modeEl.value;
+
+  const specs = [
+    ['display',  'Display'],
+    ['ram',      'RAM (GB)'],
+    ['storage',  'Storage (GB)'],
+    ['battery',  'Battery (mAh)'],
+    ['main',     'Main Cam (MP)'],
+    ['ultra',    'Ultrawide (MP)'],
+    ['tele',     'Telephoto (MP)'],
+    ['selfie',   'Selfie (MP)'],
+    ['weight',   'Weight — lighter'],
+  ];
+
+  const points = new Map(selected.map(p => [p.id, 0]));
+
+  // Build rows
+  const rows = specs.map(([k, label]) => {
+    const vals = selected.map(p => ({
+      p, v: p[k], s: scoreOf(mode, k, p)
+    }));
+    const maxS = Math.max(...vals.map(x => x.s));
+    const winners = vals.filter(x => x.s === maxS).map(x => x.p.id);
+    winners.forEach(id => points.set(id, points.get(id) + 1));
+    return { label, vals, winners };
+  });
+
+  const maxPts = Math.max(...[...points.values()]);
+
+  // ── Table ──
+  tableEl.innerHTML = `
+    <thead>
+      <tr>
+        <th class="spec-head">Spec</th>
+        ${selected.map(p => `
+          <th>
+            <div class="phone-col-brand">${p.brand}</div>
+            <div class="phone-col-name">${p.model}</div>
+            <div class="phone-col-year">${p.year}</div>
+          </th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(r => `
+        <tr>
+          <td class="spec-cell">${r.label}</td>
+          ${r.vals.map(x => `
+            <td class="${r.winners.includes(x.p.id) ? 'winner' : ''}">
+              ${x.v}${x.v === 0 ? ' <span style="opacity:.4">—</span>' : ''}
+            </td>`).join('')}
+        </tr>`).join('')}
+    </tbody>`;
+
+  // ── Summary ──
+  const sorted = [...selected].sort((a,b) => points.get(b.id) - points.get(a.id));
+  const winner = sorted[0];
+  summaryEl.innerHTML = `
+    <div class="summary-banner">
+      <span class="trophy">🏆</span>
+      <span>
+        <span class="accent" style="font-family:'Orbitron',monospace">${winner.brand} ${winner.model}</span>
+        leads with
+        <span class="accent2" style="font-family:'Orbitron',monospace">${points.get(winner.id)} / ${specs.length}</span>
+        spec wins — scored in <em>${mode}</em> mode.
+      </span>
+    </div>`;
+
+  // ── Score cards ──
+  scoresEl.innerHTML = sorted.map((p, i) => {
+    const pts = points.get(p.id);
+    const pct = Math.round((pts / specs.length) * 100);
+    return `
+      <div class="score-box rank-${i+1}" style="animation-delay:${i*.07}s">
+        <div class="rank-badge">#${i+1}</div>
+        <div class="score-name">${p.model}</div>
+        <div class="score-model">${p.brand} · ${p.year}</div>
+        <div class="score-num">${pts}</div>
+        <div class="score-label">wins out of ${specs.length}</div>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  showToast('✓ Comparison ready');
+});
+</script>
+</body>
+</html>
